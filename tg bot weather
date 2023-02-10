@@ -1,5 +1,4 @@
 import requests
-import random
 from config import tg_bot_token, open_weather_token
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -17,16 +16,7 @@ async def start_command(message: types.Message):
 @dp.message_handler()
 async def get_weather(message: types.Message):
     try:
-        advice_list = [
-            "Будьте уверены в себе и своих силах.",
-            "Никогда не сдавайтесь.",
-            "Будьте спокойны и уравновешенны.",
-            "Радуйтесь каждый день.",
-            "Будьте благодарны за то, что у вас есть.",
-            "Никогда не останавливайтесь на достигнутом.",
-            "Общайтесь с людьми и поддерживайте связи.",
-            "Будьте добры и внимательны к другим."
-        ]
+
         code_to_smile = {
             "Clear": "Ясно \U00002600",
             "Clouds": "Облачно \U00002601",
@@ -42,17 +32,23 @@ async def get_weather(message: types.Message):
         data = response.json()
         city = data["name"]
         cur_weather = data["main"]["temp"]
-
+        temp = ""
+        advice = ""
         if cur_weather < 0:
             temp = "мороз"
+            advice = 'Одевайся тепло'
         elif 0 < cur_weather < 10:
             temp = "холодно"
+            advice = 'Не забудь одеть шапку'
         elif 10 <= cur_weather < 17:
             temp = "прохладно"
+            advice = 'Одевайся, все еще прохладно'
         elif 17 <= cur_weather < 23:
             temp = "тепло"
+            advice = 'Можно идти в футболке'
         elif 23 <= cur_weather < 50:
             temp = "жарко"
+            advice = 'Одевай шорты'
 
         weather_description = data["weather"][0]["main"]
         if weather_description in code_to_smile:
@@ -61,11 +57,9 @@ async def get_weather(message: types.Message):
             wd = 'Посмотри в окно, не пойму что там за погода!'
         wind = data["wind"]["speed"]
 
-        await message.reply(f"В {city} {temp}: {int(cur_weather)}С°\n{wd}\nВетер: {int(wind)} м/с\n"
-                            f"Совет дня: {random.choice(advice_list)}")
+        await message.reply(f"В {city}'e {temp} {int(cur_weather)}С°\n{wd}\nВетер: {int(wind)} м/с\n{advice}")
     except:
         await message.reply("Проверьте название города")
-
 
 
 if __name__ == '__main__':
